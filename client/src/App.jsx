@@ -25,14 +25,14 @@ export default function App() {
   }
 
   return (
-    <main className="min-h-screen bg-cloud text-ink dark:bg-night dark:text-slate-100">
-      <header className="border-b border-ink/10 bg-white dark:border-slate-700 dark:bg-surface">
+    <main className="min-h-screen bg-cloud text-ink dark:bg-night dark:text-neutral-100">
+      <header className="border-b border-ink/10 bg-white dark:border-border dark:bg-surface">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-moss dark:text-glow">
               Open source assistive video
             </p>
-            <h1 className="mt-1 text-3xl font-bold tracking-normal text-ink dark:text-slate-100">
+            <h1 className="mt-1 text-3xl font-bold tracking-normal text-ink dark:text-neutral-50">
               VoiceForge
             </h1>
           </div>
@@ -49,8 +49,8 @@ export default function App() {
                     onClick={() => selectTab(tab.id)}
                     className={`inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss dark:focus-visible:ring-glow ${
                       selected
-                        ? "border-ink bg-ink text-white dark:border-glow dark:bg-glow dark:text-night"
-                        : "border-ink/15 bg-white text-ink hover:border-moss hover:text-moss dark:border-slate-600 dark:bg-surface dark:text-slate-200 dark:hover:border-glow dark:hover:text-glow"
+                        ? "border-ink bg-black text-white dark:border-glow dark:bg-glow dark:text-black"
+                        : "border-ink/15 bg-white text-ink hover:border-moss hover:text-moss dark:border-border dark:bg-black dark:text-neutral-200 dark:hover:border-glow dark:hover:text-glow"
                     }`}
                   >
                     <Icon aria-hidden="true" size={17} />
@@ -66,7 +66,7 @@ export default function App() {
               onClick={toggleTheme}
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               title={theme === "dark" ? "Light mode" : "Dark mode"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-ink/15 bg-white text-ink transition hover:border-moss hover:text-moss dark:border-slate-600 dark:bg-surface dark:text-slate-200 dark:hover:border-glow dark:hover:text-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss dark:focus-visible:ring-glow"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-ink/15 bg-white text-ink transition hover:border-moss hover:text-moss focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-moss dark:border-border dark:bg-black dark:text-neutral-200 dark:hover:border-glow dark:hover:text-glow dark:focus-visible:ring-glow"
             >
               {theme === "dark" ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
             </button>
