@@ -24,6 +24,7 @@ function getDB() {
       };
 
       request.onblocked = () => {
+        dbPromise = null; // reset so next call retries
         reject(new Error("Database access is blocked. Please close other open tabs."));
       };
 
