@@ -7,6 +7,7 @@ export default React.forwardRef(function VideoPreview({
   webcamStream,
   audioUrl,
   isSpeaking,
+  onSpeakingChange,
   calibration = { xOffset: 0, yOffset: 0, scale: 1.0 },
   isCalibrating = false
 }, ref) {
@@ -141,7 +142,16 @@ export default React.forwardRef(function VideoPreview({
         className="aspect-video w-full rounded-md bg-black object-cover"
       />
       {audioUrl && (
-        <audio className="mt-4 w-full" controls src={audioUrl} autoPlay>
+        <audio
+          className="mt-4 w-full"
+          controls
+          src={audioUrl}
+          autoPlay
+          onPlay={() => onSpeakingChange?.(true)}
+          onPause={() => onSpeakingChange?.(false)}
+          onEnded={() => onSpeakingChange?.(false)}
+          onError={() => onSpeakingChange?.(false)}
+        >
           <track kind="captions" />
         </audio>
       )}

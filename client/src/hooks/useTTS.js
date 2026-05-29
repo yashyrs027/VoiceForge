@@ -23,26 +23,17 @@ export default function useTTS() {
         throw new Error(payload.error || "Speech generation failed.");
       }
 
-      const audioBlob = await response.blob();
-      const nextAudioUrl = URL.createObjectURL(audioBlob);
-      setAudioUrl((previous) => {
-        if (previous) URL.revokeObjectURL(previous);
-        return nextAudioUrl;
-      });
+      const payload = await response.json();
+      const nextAudioUrl = payload.audioUrl;
+      setAudioUrl(nextAudioUrl);
       setStatus("ready");
-      return { audioBlob, audioUrl: nextAudioUrl };
+      return { audioUrl: nextAudioUrl };
     } catch (ttsError) {
       setError(ttsError?.message || String(ttsError));
       setStatus("error");
       throw ttsError;
     }
   }
-
-  React.useEffect(() => {
-    return () => {
-      if (audioUrl) URL.revokeObjectURL(audioUrl);
-    };
-  }, [audioUrl]);
 
   return { speak, status, error, audioUrl };
 }

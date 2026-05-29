@@ -62,6 +62,8 @@ export async function cloneVoice(request, response, next) {
   }
 }
 
+const pendingStreams = new Map();
+
 export async function speak(request, response, next) {
   try {
     const apiKey = requireApiKey();
@@ -72,7 +74,39 @@ export async function speak(request, response, next) {
       return;
     }
 
-    const elevenResponse = await fetch(`${ELEVENLABS_BASE_URL}/text-to-speech/${voiceId}`, {
+    const speechId = Math.random().toString(36).substring(2, 15);
+    pendingStreams.set(speechId, { text, voiceId, apiKey });
+
+    // Set a timeout to clean up if the stream is never requested within 60s
+    setTimeout(() => {
+      pendingStreams.delete(speechId);
+    }, 60000);
+
+    response.json({
+      speechId,
+      audioUrl: `/api/voice/speak/stream/${speechId}`
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function streamSpeech(request, response, next) {
+  try {
+    const { speechId } = request.params;
+    const streamData = pendingStreams.get(speechId);
+
+    if (!streamData) {
+      response.status(404).json({ error: "Speech stream not found or expired." });
+      return;
+    }
+
+    // Clean up immediately after retrieving parameters to prevent memory leaks
+    pendingStreams.delete(speechId);
+
+    const { text, voiceId, apiKey } = streamData;
+
+    const elevenResponse = await fetch(`${ELEVENLABS_BASE_URL}/text-to-speech/${voiceId}/stream`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,15 +126,26 @@ export async function speak(request, response, next) {
     });
 
     if (!elevenResponse.ok) {
-      const error = new Error(await readElevenLabsError(elevenResponse));
-      error.status = elevenResponse.status;
-      throw error;
+      const errorText = await readElevenLabsError(elevenResponse);
+      response.status(elevenResponse.status).send(errorText);
+      return;
     }
 
-    const audioBuffer = Buffer.from(await elevenResponse.arrayBuffer());
     response.setHeader("Content-Type", "audio/mpeg");
-    response.setHeader("Content-Length", audioBuffer.length);
-    response.send(audioBuffer);
+    response.setHeader("Transfer-Encoding", "chunked");
+
+    const reader = elevenResponse.body.getReader();
+
+    request.on("close", () => {
+      reader.cancel().catch((err) => console.error("Error cancelling ElevenLabs reader:", err));
+    });
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      response.write(value);
+    }
+    response.end();
   } catch (error) {
     next(error);
   }

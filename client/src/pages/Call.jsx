@@ -119,14 +119,9 @@ export default function Call() {
   async function handleSpeak(text) {
     if (!activeProfile?.voice_id) return;
     try {
-      const result = await speak({ text, voiceId: activeProfile.voice_id });
-      setIsSpeaking(true);
-      const audio = new Audio(result.audioUrl);
-      audio.onended = () => setIsSpeaking(false);
-      audio.onerror = () => setIsSpeaking(false);
-      await audio.play();
-    } catch {
-      setIsSpeaking(false);
+      await speak({ text, voiceId: activeProfile.voice_id });
+    } catch (err) {
+      console.error("TTS streaming error:", err);
     }
   }
 
@@ -307,7 +302,8 @@ export default function Call() {
           ref={canvasRef}
           webcamStream={webcamStream}
           audioUrl={audioUrl}
-          isSpeaking={isSpeaking || status === "speaking"}
+          isSpeaking={isSpeaking}
+          onSpeakingChange={setIsSpeaking}
           calibration={calibration}
           isCalibrating={isCalibrationOpen}
         />
