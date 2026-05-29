@@ -1,7 +1,6 @@
 // Provides a small client-side API for uploading a recording and saving cloned voice profiles.
 import React from "react";
 import { getAllProfiles, saveProfile, deleteProfile } from "../utils/db.js";
-import { decryptStore } from "../utils/crypto.js";
 
 const ACTIVE_KEY = "voiceforge:activeVoiceId";
 
@@ -61,9 +60,6 @@ export default function useVoiceClone() {
 
       const response = await fetch("/api/voice/clone", {
         method: "POST",
-        headers: {
-          "X-ElevenLabs-Api-Key": decryptStore(localStorage.getItem("voiceforge:elevenlabsApiKey") || "")
-        },
         body: formData
       });
       const payload = await response.json();
