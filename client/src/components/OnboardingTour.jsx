@@ -163,10 +163,7 @@ const joyrideStyles = {
 };
 
 export default function OnboardingTour({ activeTab, onSelectTab }) {
-  const { runTour, stopTour } = useOnboarding({
-    autoStart: true,
-    ignoreCompletion: true,
-  });
+  const { runTour, stopTour, tourStartIndex } = useOnboarding({ autoStart: true });
   const [stepIndex, setStepIndex] = React.useState(() => getInitialStepIndex(activeTab));
   const wasRunningRef = React.useRef(false);
 
@@ -180,10 +177,10 @@ export default function OnboardingTour({ activeTab, onSelectTab }) {
 
   React.useEffect(() => {
     if (runTour && !wasRunningRef.current) {
-      setStepIndex(getInitialStepIndex(activeTab));
+      setStepIndex(Number.isInteger(tourStartIndex) ? tourStartIndex : getInitialStepIndex(activeTab));
     }
     wasRunningRef.current = runTour;
-  }, [activeTab, runTour]);
+  }, [activeTab, runTour, tourStartIndex]);
 
   const finishTour = React.useCallback(() => {
     setStepIndex(getInitialStepIndex(activeTab));
@@ -228,7 +225,6 @@ export default function OnboardingTour({ activeTab, onSelectTab }) {
     runTour ? (
       <Joyride
         continuous
-        disableOverlayClose
         floaterProps={{
           disableAnimation: false,
           options: {
@@ -248,6 +244,7 @@ export default function OnboardingTour({ activeTab, onSelectTab }) {
           skip: "Skip",
         }}
         onEvent={handleCallback}
+        overlayClickAction={false}
         run={runTour}
         scrollOffset={96}
         scrollToFirstStep
