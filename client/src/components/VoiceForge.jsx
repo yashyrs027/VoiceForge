@@ -105,15 +105,16 @@ export default function VoiceForge() {
   }, [handleSpeak]);
 
   const charsLeft = MAX_CHARS - inputText.length;
+  const [announcement, setAnnouncement] = useState("");
   const hasAnnouncedRef = useRef(false);
-  const warningTextRef = useRef("");
-
+  
   React.useEffect(() => {
     if (charsLeft < 50 && !hasAnnouncedRef.current) {
       hasAnnouncedRef.current = true;
-      warningTextRef.current = `Warning: only ${charsLeft} characters remaining.`;
+      setAnnouncement(`Warning: only ${charsLeft} characters remaining.`);
     } else if (charsLeft >= 50) {
       hasAnnouncedRef.current = false;
+      setAnnouncement("");
     }
   }, [charsLeft]);
 
@@ -194,8 +195,8 @@ export default function VoiceForge() {
               {inputText.length} / {MAX_CHARS}
             </span>
             {charsLeft < 50 && (
-              <div className="sr-only" aria-live="assertive">
-                {warningTextRef.current}
+              <div className="sr-only" aria-live="assertive" aria-atomic="true">
+                {announcement}
               </div>
             )}
           </div>
