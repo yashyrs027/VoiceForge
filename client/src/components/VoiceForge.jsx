@@ -114,6 +114,8 @@ export default function VoiceForge() {
   const charsLeft = MAX_CHARS - inputText.length;
 
   
+  const hasAnnouncedRef = useRef(false);
+
   useEffect(() => {
     if (charsLeft < 50 && !hasAnnouncedRef.current) {
       hasAnnouncedRef.current = true;
