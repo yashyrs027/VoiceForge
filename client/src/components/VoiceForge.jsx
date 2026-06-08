@@ -194,11 +194,9 @@ export default function VoiceForge() {
             >
               {inputText.length} / {MAX_CHARS}
             </span>
-            {charsLeft < 50 && (
-              <div className="sr-only" aria-live="assertive" aria-atomic="true">
-                {announcement}
-              </div>
-            )}
+            <div className="sr-only" aria-live="assertive" aria-atomic="true">
+              {announcement}
+            </div>
           </div>
 
           <textarea
