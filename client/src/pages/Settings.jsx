@@ -1,4 +1,4 @@
-// Lets users save their ElevenLabs API key locally and manage browser-stored voice profiles.
+// Lets users save their ElevenLabs API key for the current session and manage browser-stored voice profiles.
 import React from "react";
 import { ExternalLink, Trash2, CircleAlert, RotateCcw } from "lucide-react";
 import {
@@ -34,12 +34,20 @@ export default function Settings() {
   const { resetTour } = useOnboarding();
   const [apiKey, setApiKey] = React.useState(() => {
     try {
-      return localStorage.getItem("voiceforge:elevenlabsApiKey") || "";
+      return getApiKey();
     } catch {
       return "";
     }
   });
-  
+
+  React.useEffect(() => {
+    const migrated = migrateFromLocalStorage();
+    if (migrated) {
+      setApiKeyInput(getApiKey());
+      setMigratedNotice(true);
+    }
+  }, []);
+
   React.useEffect(() => {
     async function loadProfiles() {
       try {
@@ -53,6 +61,7 @@ export default function Settings() {
     loadProfiles();
   }, []);
 
+
   const defaultSettings = { stability: 0.45, similarity_boost: 0.8, style: 0.2 };
   const [voiceSettings, setVoiceSettings] = React.useState(() => {
     try {
@@ -63,12 +72,10 @@ export default function Settings() {
   });
 
   function saveApiKey() {
-    try {
-      localStorage.setItem("voiceforge:elevenlabsApiKey", apiKey);
-    } catch {
-      // Storage unavailable
-    }
+    setApiKey(apiKey);
   }
+
+
 
   function saveVoiceSettings(newSettings) {
     setVoiceSettings(newSettings);
@@ -142,8 +149,11 @@ export default function Settings() {
               id="api-key"
               type="password"
               value={apiKey}
-              onChange={(event) => setApiKey(event.target.value)}
+
+              onChange={(event) => setApiKeyInput(event.target.value)}
               className="mt-2 min-h-11 w-full rounded-md border border-ink/15 bg-cloud px-3 text-ink outline-none focus:border-moss focus:ring-4 focus:ring-mint dark:border-border dark:bg-black dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-glow dark:focus:ring-glow/25"
+
+
               placeholder="sk_..."
             />
           </label>
@@ -165,8 +175,11 @@ export default function Settings() {
           </a>
         </div>
         <p className="mt-3 text-sm text-ink/65 dark:text-muted">
-          The backend reads `.env` first. This local key is available for future
-          client-only experiments.
+          Your key is kept for this browser session only — it is cleared when
+          you close the tab and is not shared with other tabs. You will need to
+          re-enter it each session. The backend reads{" "}
+          <code className="font-mono">.env</code> first; this field is a
+          client-side override.
         </p>
       </section>
 
